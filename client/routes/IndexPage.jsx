@@ -1,33 +1,28 @@
 import React from 'react'
-import {fetchInitialData, getInitialData} from "../helpers/initialData";
-
-const busyBraile = ['⠙', '⠸', '⢰', '⣠', '⣄', '⡆', '⠇', '⠋'];
+import { fetchInitialData, getInitialData } from "../helpers/initialData";
+import { registerCanvas } from "../game/canvas";
+import game from "../game/game";
 
 export default class IndexPage extends React.Component {
 	state = {
 		...getInitialData(),
-		counter: 0,
 	};
+	
+	canvas = React.createRef();
 	
 	async componentDidMount() {
 		this.setState({
 			...(await fetchInitialData()),
 		});
-		this.interval = setInterval(() => {
-			this.setState({counter: (this.state.counter + 1) % busyBraile.length})
-		}, 100);
-	}
-	
-	componentWillUnmount() {
-		clearInterval(this.interval);
+		
+		registerCanvas(this.canvas.current);
+		game.start();
 	}
 	
 	render() {
 		return (
 			<div className="IndexPage">
-				{busyBraile[this.state.counter]}
-				{this.state.kek}
-				{busyBraile[this.state.counter]}
+				<canvas className="mainCanvas" ref={this.canvas} />
 			</div>
 		)
 	}

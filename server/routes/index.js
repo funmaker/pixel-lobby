@@ -1,12 +1,36 @@
-import os from 'os';
+import game from "../game/game";
+import * as packets from "../../packets";
 
 export const router = require('express-promise-router')();
+
+export const users = new Set();
 
 router.get('/', (req, res) => {
 	const initialData = {};
 	
-	initialData.kek = `Welcome to boilerplate on ${os.hostname()}!`;
-	
 	res.react(initialData);
 });
 
+setImmediate(() => {
+	router.ws("/ws", (ws, req) => {
+		users.add(ws);
+		console.log(`User connected: ${req.connection.remoteAddress}`);
+		
+		ws.on("close", (code, reason) => {
+			console.log(`User disconnected: ${req.connection.remoteAddress}, ${code} - ${reason}`)
+			users.delete(ws);
+		});
+		
+		ws.on("message", data => {
+			try {
+				data = JSON.parse(data);
+				game.handlePacket(ws, data);
+			} catch(e) {
+				ws.close(4000, e.message);
+				console.error(e);
+			}
+		});
+		
+		ws.send(packets.state(game));
+	});
+});
