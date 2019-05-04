@@ -3,3 +3,5 @@
 /prod
 /build
 /node_modules
+/static/images/characters/*
+!/static/images/characters/default.png

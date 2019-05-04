@@ -1,24 +1,20 @@
 import uuid from "uuid/v4";
 import game from "./game";
-import { entityTypes as types } from "../../packets";
-import { simulatePhysics } from "../../physics";
+import { entityTypes as types } from "../../shared/packets";
+import { simulatePhysics } from "../../shared/physics";
+import { Vector } from "../../shared/math";
 export { types };
 
 export default class Entity {
   id = uuid();
-  x = 0;
-  y = 0;
-  z = 0;
-  vx = 0;
-  vy = 0;
-  vz = 0;
+  pos = new Vector();
+  vel = new Vector();
+  
   type = types.UNKNOWN;
   dirty = false;
   
-  constructor(x, y, z) {
-    this.x = x;
-    this.y = y;
-    this.z = z;
+  constructor(pos) {
+    this.pos = pos;
   }
   
   remove() {

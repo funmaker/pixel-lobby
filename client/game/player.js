@@ -12,15 +12,30 @@ export default class Player extends Entity {
     this.updateSprite(createEntity.extra.sprite);
   }
   
-  onDraw(ctx) {
-    const { x, y } = this.screenPos(ctx);
+  onDraw(ctx, deltaTime) {
+    super.onDraw(ctx, deltaTime);
+    
+    const { x, y } = this.screenPos();
     const sprite = this.sprite.loaded ? this.sprite : sprites["characters/default"];
     
     ctx.save();
     ctx.translate( x, y );
-    if((this.vx || this.vy) && this.z === 0) ctx.rotate(Math.sin(Date.now() / 50) * 0.1);
-    ctx.translate( 0, -sprite.texture.height / 2);
-    sprite.draw(ctx, 0, 0);
+    if(this.name === "sanic") {
+      if(this.vel.magnitude() && this.pos.z === 0){
+        ctx.rotate(Math.sin(Date.now() / 15) * 0.1);
+        ctx.translate( 0, -sprite.texture.height / 2);
+        sprite.draw(ctx, 0, 0);
+      } else if(this.pos.z !== 0) {
+        ctx.rotate((Date.now() / 30) % (Math.PI * 2));
+        sprite.draw(ctx, 0, 0);
+      } else {
+        sprite.draw(ctx, 0, -sprite.texture.height / 2);
+      }
+    } else {
+      if(this.vel.magnitude() && this.pos.z === 0) ctx.rotate(Math.sin(Date.now() / 50) * 0.1);
+      ctx.translate( 0, -sprite.texture.height / 2);
+      sprite.draw(ctx, 0, 0);
+    }
     ctx.restore();
   
     ctx.font = '16px minecraft';

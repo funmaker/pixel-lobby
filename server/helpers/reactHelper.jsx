@@ -26,8 +26,6 @@ export function reactMiddleware(req, res, next) {
 			case "html":
 				const initialDataJSON = JSON.stringify(initialData).replace(removeTags, tag => tagsToReplace[tag] || tag);
 				
-				console.log(StaticRouter);
-				
 				res.send(index({
 					reactContent: ReactDOMServer.renderToString(
 						<StaticRouter location={req.originalUrl} context={{}}>

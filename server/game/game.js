@@ -1,11 +1,13 @@
 import Player from "./player";
-import * as packets from "../../packets";
+import * as packets from "../../shared/packets";
 import { users } from "../routes/index";
+import { drawLine, flushLines } from "./board";
 
 export default new class Game {
   entities = new Map();
   players = new Map();
   lastTick = Date.now();
+  lines = [];
   
   constructor() {
     setInterval(this.onTick, 1000 / 30);
@@ -22,15 +24,10 @@ export default new class Game {
   };
   
   onNetwork = () => {
-    if([...this.entities.values()].some(entity => entity.dirty)) {
-      const update = packets.update(this);
-      
-      for(const entity of this.entities.values()) {
-        entity.dirty = false;
-      }
-      
-      this.sendAll(update);
-    }
+    const update = packets.update(this, flushLines());
+    this.sendAll(update);
+    
+    for(const entity of this.entities.values()) entity.dirty = false;
   };
   
   addEntity(entity) {
@@ -53,7 +50,7 @@ export default new class Game {
   }
   
   handlePacket(ws, data) {
-    if(data.type !== packets.types.MOVE) console.log(data);
+    if(data.type !== packets.types.MOVE && data.type !== packets.types.LINE) console.log(data);
     const player = this.players.get(ws);
     
     switch(data.type) {
@@ -83,11 +80,19 @@ export default new class Game {
         ws.send(packets.chat(data.name, player.name));
         break;
       }
-      
+  
       case packets.types.MOVE: {
         if(!player) throw new Error(`User not joined`);
-        
+    
         player.move(data.key, data.pressed);
+        break;
+      }
+  
+      case packets.types.LINE: {
+        if(!player) throw new Error(`User not joined`);
+        
+        const {x1, y1, x2, y2, width, clear} = data;
+        drawLine(x1, y1, x2, y2, width, clear);
         break;
       }
       

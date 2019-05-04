@@ -1,5 +1,6 @@
 import game from "../game/game";
-import * as packets from "../../packets";
+import * as packets from "../../shared/packets";
+import { boardPngStream } from "../game/board";
 
 export const router = require('express-promise-router')();
 
@@ -9,6 +10,11 @@ router.get('/', (req, res) => {
 	const initialData = {};
 	
 	res.react(initialData);
+});
+
+router.get('/board.png', (req, res) => {
+	res.setHeader('Content-Type', 'image/png');
+	boardPngStream().pipe(res);
 });
 
 setImmediate(() => {

@@ -22,7 +22,7 @@ function onResize() {
 function onDraw() {
   if(!canvas) return;
   ctx.resetTransform();
-  ctx.fillStyle = "#d1a078";
+  ctx.fillStyle = "#000";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   
   game.onDraw(ctx);

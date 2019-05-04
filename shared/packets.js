@@ -8,6 +8,7 @@ export const types = {
   UPDATE: "UPDATE",
   CHAT: "CHAT",
   MOVE: "MOVE",
+  LINE: "LINE",
 };
 
 export const entityTypes = {
@@ -26,14 +27,13 @@ export const leave = () => JSON.stringify({
 
 const entityState = (entity) => ({
   id: entity.id, entityType: entity.type,
-  x: entity.x, y: entity.y, z: entity.z,
-  vx: entity.vx, vy: entity.vy, vz: entity.vz,
+  pos: entity.pos, vel: entity.vel,
   extra: entity.getExtraState(),
 });
 
 export const state = (game) => JSON.stringify({
   type: types.STATE,
-  entities: [...game.entities.values()].map(createEntity).map(entityState),
+  entities: [...game.entities.values()].map(entityState),
 });
 
 export const createEntity = (entity) => JSON.stringify({
@@ -48,14 +48,14 @@ export const removeEntity = (entity) => JSON.stringify({
 
 const updateEntity = (entity) => ({
   id: entity.id,
-  x: entity.x, y: entity.y, z: entity.z,
-  vx: entity.vx, vy: entity.vy, vz: entity.vz,
+  pos: entity.pos, vel: entity.vel,
   extra: entity.getExtraStateUpdate(),
 });
 
-export const update = (game) => JSON.stringify({
+export const update = (game, lines) => JSON.stringify({
   type: types.UPDATE,
   entities: [...game.entities.values()].filter(entity => entity.dirty).map(updateEntity),
+  lines,
 });
 
 export const chat = (text, user) => JSON.stringify({
@@ -66,4 +66,9 @@ export const chat = (text, user) => JSON.stringify({
 export const move = (key, pressed) => JSON.stringify({
   type: types.MOVE,
   key, pressed,
+});
+
+export const line = (x1, y1, x2, y2, width, clear) => JSON.stringify({
+  type: types.LINE,
+  x1, y1, x2, y2, width, clear
 });

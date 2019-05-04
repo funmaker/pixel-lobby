@@ -1,11 +1,16 @@
 import fs from "fs-extra";
 import path from "path";
 import Entity, { types } from "./entity";
+import { Vector } from "../../shared/math";
 
 const defaultSprites = [
   "anonymous",
   "borat",
   "hitler",
+  "kkk",
+  "bambo",
+  "papaj",
+  "exhibitionist",
 ];
 
 export default class Player extends Entity {
@@ -23,8 +28,7 @@ export default class Player extends Entity {
   };
   
   constructor(name, ws) {
-    super(Math.random() * 70 - 35, Math.random() * 70 - 35, 0);
-    this.x = this.y = this.z = 0;
+    super(new Vector(Math.random() * 70 - 35, Math.random() * 70 - 35, 0));
     this.name = name;
     this.ws = ws;
     
@@ -56,16 +60,16 @@ export default class Player extends Entity {
     let speed = 100;
     
     if(this.sprite === "sanic") speed *= 5;
+  
+    this.vel.x = (this.keys.right - this.keys.left) * speed;
+    this.vel.y = (this.keys.down - this.keys.up) * speed;
     
-    this.vy = (this.keys.down - this.keys.up) * speed;
-    this.vx = (this.keys.right - this.keys.left) * speed;
-    
-    if(this.keys.jump && this.z === 0) {
-      this.vz = 300;
+    if(this.keys.jump && this.pos.z === 0) {
+      this.vel.z = 300;
       this.dirty = true;
     }
     
-    if(this.vx || this.vy || this.vz || this.dirtyKeys) this.dirty = true;
+    if(this.vel.x || this.vel.y || this.vel.z || this.dirtyKeys) this.dirty = true;
     this.dirtyKeys = false;
     
     super.onTick(deltaTime);
