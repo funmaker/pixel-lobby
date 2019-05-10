@@ -22,6 +22,10 @@ export class Vector {
     return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
   }
   
+  magnitude2() {
+    return this.x * this.x + this.y * this.y + this.z * this.z;
+  }
+  
   add(rhs) {
     if(!(rhs instanceof Vector)) rhs = new Vector(rhs);
     return new Vector(this.x + rhs.x, this.y + rhs.y, this.z + rhs.z);
@@ -106,6 +110,9 @@ export class SmoothVector extends Vector {
     this.xSmooth.set(current.x);
     this.ySmooth.set(current.y);
     this.zSmooth.set(current.z);
+    this.x = this.xSmooth.current;
+    this.y = this.ySmooth.current;
+    this.z = this.zSmooth.current;
   }
   
   update(deltaTime) {

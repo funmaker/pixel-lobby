@@ -1,0 +1,38 @@
+
+export class Drawable {
+  width; height;
+  
+  constructor(width = 0, height = 0) {
+    this.width = width;
+    this.height = height;
+  }
+  
+  draw(ctx, x, y, scale = 1) {
+    
+  }
+}
+
+export class ChatBubble extends Drawable {
+  text;
+  
+  constructor(text, ctx) {
+    ctx.font = '10px minecraft';
+    const measure = ctx.measureText(text);
+    super(measure.width + 4, 12);
+    
+    this.text = text;
+  }
+  
+  draw(ctx, x, y) {
+    const r = 3,
+          w = this.width / 2,
+          h = this.height / 2;
+  
+    ctx.fillStyle = "#0007";
+    ctx.fillRect(x - w, y - h, this.width, this.height);
+  
+    ctx.font = '10px minecraft';
+    ctx.fillStyle = "#fff";
+    ctx.fillText(this.text, x - w + 2, y + h - 2);
+  }
+}

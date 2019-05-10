@@ -1,3 +1,12 @@
+import BSON from "bson";
+
+// Network entities
+import "./entity/entity";
+import "./entity/player";
+import "./entity/staticImage";
+import "./entity/board";
+import "./entity/youtube";
+import "./entity/button";
 
 export const types = {
   JOIN: "JOIN",
@@ -11,64 +20,47 @@ export const types = {
   LINE: "LINE",
 };
 
-export const entityTypes = {
-  UNKNOWN: "UNKNOWN",
-  PLAYER: "PLAYER",
-};
-
-export const join = (name) => JSON.stringify({
+export const join = (name) => BSON.serialize({
   type: types.JOIN,
   name,
 });
 
-export const leave = () => JSON.stringify({
+export const leave = () => BSON.serialize({
   type: types.LEAVE,
 });
 
-const entityState = (entity) => ({
-  id: entity.id, entityType: entity.type,
-  pos: entity.pos, vel: entity.vel,
-  extra: entity.getExtraState(),
-});
-
-export const state = (game) => JSON.stringify({
+export const state = (room, player) => BSON.serialize({
   type: types.STATE,
-  entities: [...game.entities.values()].map(entityState),
+  ...room.serialize(),
+  localPlayer: player.id,
 });
 
-export const createEntity = (entity) => JSON.stringify({
+export const createEntity = (entity) => BSON.serialize({
   type: types.CREATE_ENTITY,
-  ...entityState(entity),
+  ...entity.serialize(),
 });
 
-export const removeEntity = (entity) => JSON.stringify({
+export const removeEntity = (entity) => BSON.serialize({
   type: types.REMOVE_ENTITY,
   id: entity.id,
 });
 
-const updateEntity = (entity) => ({
-  id: entity.id,
-  pos: entity.pos, vel: entity.vel,
-  extra: entity.getExtraStateUpdate(),
-});
-
-export const update = (game, lines) => JSON.stringify({
+export const update = (room) => BSON.serialize({
   type: types.UPDATE,
-  entities: [...game.entities.values()].filter(entity => entity.dirty).map(updateEntity),
-  lines,
+  ...room.getUpdate(),
 });
 
-export const chat = (text, user) => JSON.stringify({
-  type: types.STATE,
+export const chat = (text, user) => BSON.serialize({
+  type: types.CHAT,
   text, user,
 });
 
-export const move = (key, pressed) => JSON.stringify({
+export const move = (key, pressed) => BSON.serialize({
   type: types.MOVE,
   key, pressed,
 });
 
-export const line = (x1, y1, x2, y2, width, clear) => JSON.stringify({
+export const line = (id, x1, y1, x2, y2, width, clear) => BSON.serialize({
   type: types.LINE,
-  x1, y1, x2, y2, width, clear
+  id, x1, y1, x2, y2, width, clear
 });
