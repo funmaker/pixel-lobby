@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import morgan from 'morgan';
 import http from 'http';
+import path from "path";
 import {router} from "./routes/index";
 import {reactMiddleware} from "./helpers/reactHelper";
 import HTTPError from "./helpers/HTTPError";
@@ -19,9 +20,10 @@ if(process.env.NODE_ENV === 'development') {
 	app.use(morgan('dev'));
 	app.use(require('./helpers/webpackHelper').mount());
 } else {
-	app.use('/client.js', express.static('client.js'));
+	app.use(/.*\/((?:[0-9]+\.)?client\.js)$/, (req, res) => res.sendFile(path.join(__dirname, req.params[0])));
 	app.use('/style.css', express.static('style.css'));
 }
+
 
 app.use(reactMiddleware);
 

@@ -5,6 +5,7 @@ import { PHYSICS_TYPE } from "../physics";
 import * as packets from "../packets";
 
 export default class Youtube extends Entity {
+  static type = Entity.registerType("Youtube", this);
   physics = PHYSICS_TYPE.NONE;
   videoID = null;
   started = Date.now();
@@ -19,6 +20,7 @@ export default class Youtube extends Entity {
       this.playerWrapper = document.createElement('div');
       document.body.prepend(this.playerWrapper);
       this.player = new YouTubePlayer(this.playerWrapper);
+      this.player.on('ready', ev => this.playerRaw = ev.target);
       this.player.on('stateChange', this.onStateChange);
       this.player.getIframe().then(iframe => this.playerDOM = iframe);
       
@@ -66,11 +68,17 @@ export default class Youtube extends Entity {
   onStateChange = async () => {
     const curtime = await this.player.getCurrentTime();
     const target = (Date.now() - this.started) / 1000;
-    if(Math.abs(curtime - target) > 2) await this.player.seekTo(target, true);
-    if(await this.player.getPlayerState() !== 1) await this.player.playVideo();
+    const duration = await this.player.getDuration();
+    const isLive = this.playerRaw.getVideoData().isLive || this.playerRaw.getPlaybackQuality() === "auto"; // Not reliable
+    if(isLive) {
+      if(await this.player.getPlayerState() !== 1) await this.player.playVideo();
+    } else {
+      if(Math.abs(curtime - target) > 0.5 && !this.livestream) await this.player.seekTo(target, true);
+      if(target < duration && await this.player.getPlayerState() !== 1) await this.player.playVideo();
+    }
   };
   
-  play(videoID, time) {
+  async play(videoID, time) {
     this.videoID = videoID;
     this.started = Date.now() - time;
     if(SERVER) {
@@ -78,7 +86,7 @@ export default class Youtube extends Entity {
       this.extraStateUpdate.time = time;
       this.dirty = true;
     } else {
-      this.player.loadVideoById(videoID, time / 1000);
+      await this.player.loadVideoById(videoID, time / 1000);
     }
   }
   
@@ -111,5 +119,3 @@ export default class Youtube extends Entity {
     }
   }
 }
-
-Entity.types.Youtube = Youtube;

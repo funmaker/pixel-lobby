@@ -21,8 +21,8 @@ export default {
 		devtoolModuleFilenameTemplate: "[absolute-resource-path]",
 	},
 	node: {
-		__filename: true,
-		__dirname: true,
+		__filename: false,
+		__dirname: false,
 	},
 	plugins: [],
 	module: {
@@ -43,6 +43,7 @@ export default {
 					plugins: [
 						"@babel/plugin-proposal-object-rest-spread",
 						"@babel/plugin-proposal-class-properties",
+						"@babel/plugin-syntax-dynamic-import",
 					],
 				},
 			}, {

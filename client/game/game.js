@@ -6,6 +6,10 @@ import { Render } from "./render";
 import { handlePacket } from "./packetHandler";
 import SpritesManager from "./spritesManager";
 
+// Bundle All Entities
+const context = require.context('../../shared/entity/', true, /\.js$/);
+context.keys().forEach(filename => context(filename));
+
 const BUSY_BRAILE = ['⠙', '⠸', '⢰', '⣠', '⣄', '⡆', '⠇', '⠋'];
 
 export default class Game extends EventEmitter {
@@ -61,6 +65,7 @@ export default class Game extends EventEmitter {
     this.room = room;
     this.localPlayer = localPlayer;
     this.localPlayer.takeControl();
+    this.scroll = this.localPlayer.pos.x;
   }
   
   send(packet) {
@@ -96,7 +101,7 @@ export default class Game extends EventEmitter {
     
     if(!this.room) return;
   
-    this.scale = Math.max(Math.floor(ctx.canvas.height / 275), Math.ceil(ctx.canvas.width / 500), 1);
+    this.scale = Math.max(Math.floor(ctx.canvas.height / 275), Math.ceil(ctx.canvas.width / 800), 1);
     
     if(this.localPlayer) {
       const x = this.localPlayer.smoothPos.x;

@@ -2,7 +2,6 @@ import { Vector } from "../math";
 import Entity from "./entity";
 import * as packets from "../packets";
 import Particle from "./particle";
-import { ChatBubble } from "../../client/game/drawable";
 
 const KEYS = {
   up: "KeyW",
@@ -13,6 +12,7 @@ const KEYS = {
 };
 
 export default class Player extends Entity {
+  static type = Entity.registerType("Player", this);
   name;
   ws;
   size = new Vector(60, 10, 96);
@@ -92,11 +92,14 @@ export default class Player extends Entity {
   onDraw(ctx, deltaTime) {
     super.onDraw(ctx, deltaTime);
     
-    const { x, y } = this.room.localToCanvas(this.smoothPos.sub(new Vector(0, 0, this.size.z / 2)));
+    let { x, y } = this.room.localToCanvas(this.smoothPos.sub(new Vector(0, 0, this.size.z / 2)));
     const sprite = this.sprite.loaded ? this.sprite : GAME.sprites.get("characters/default");
+    const sitting = this.room.findEntities("SitZone").some(zone => zone.contains(this));
+    if(sitting) y += 20;
     
     ctx.save();
     ctx.translate( x, y );
+    if(sitting) ctx.scale(-1, 1);
     if(this.name === "sanic") {
       if(this.vel.magnitude() && this.pos.z <= this.size.z / 2){
         ctx.rotate(Math.sin(Date.now() / 15) * 0.1);
@@ -116,12 +119,14 @@ export default class Player extends Entity {
     }
     ctx.restore();
     
+    if(sitting) ctx.globalAlpha = 0.1;
     ctx.font = '16px minecraft';
     const measure = ctx.measureText(this.name);
     ctx.fillStyle = "#0007";
     ctx.fillRect(x - measure.width / 2 - 2, y - sprite.texture.height - 25, measure.width + 2, 18);
     ctx.fillStyle = "#fff";
     ctx.fillText(this.name, x - measure.width / 2, y - sprite.texture.height - 10);
+    if(sitting) ctx.globalAlpha = 1;
   }
   
   takeControl() {
@@ -167,5 +172,3 @@ export default class Player extends Entity {
     }
   }
 }
-
-Entity.types.Player = Player;

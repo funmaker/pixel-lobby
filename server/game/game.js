@@ -5,6 +5,7 @@ import Player from "../../shared/entity/player";
 import path from "path";
 import fs from "fs-extra";
 import { generateRooms } from "./rooms";
+import Store from "./store";
 
 const YOUTUBE_REGEX = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
 
@@ -23,6 +24,7 @@ export default new class Game {
   rooms = [];
   players = new Map();
   lastTick = Date.now();
+  store = new Store("store.bson");
   
   constructor() {
     setInterval(this.onTick, 1000 / 100);
@@ -34,7 +36,7 @@ export default new class Game {
       global.GAME = this;
     }
     
-    this.rooms = generateRooms();
+    setImmediate(() => this.rooms = generateRooms());
   }
   
   onTick = () => {
@@ -74,7 +76,7 @@ export default new class Game {
   }
   
   async handlePacket(ws, data) {
-    if(data.type !== packets.types.MOVE && data.type !== packets.types.LINE) console.log(data);
+    if(process.env.NODE_ENV === 'development' && data.type !== packets.types.MOVE && data.type !== packets.types.INTERACT) console.log(data);
     const player = this.players.get(ws);
     
     switch(data.type) {
@@ -82,9 +84,12 @@ export default new class Game {
         if(player) throw new Error(`User already joined`);
   
         const room = this.rooms[0];
+        const spawn = room.findEntity("SpawnZone");
         const sprite = await this.determineSprite(data.name).catch(console.error);
         const newPlayer = new Player(data.name, ws);
+        
         newPlayer.changeSprite(sprite);
+        if(spawn) newPlayer.pos = spawn.sample();
         room.addEntity(newPlayer);
         this.players.set(ws, newPlayer);
         ws.send(packets.state(room, newPlayer));
@@ -134,14 +139,12 @@ export default new class Game {
         break;
       }
   
-      case packets.types.LINE: {
+      case packets.types.INTERACT: {
         if(!player) throw new Error(`User not joined`);
         
-        const board = player.room.entities.get(data.id);
-        if(!board) throw new Error(`Board not found: \`${data.id}\``);
-        
-        const { x1, y1, x2, y2, lineWidth, clear } = data;
-        board.drawLine(x1, y1, x2, y2, lineWidth, clear);
+        const entity = player.room.entities.get(data.id);
+        if(!entity) throw new Error(`Entity not found: ${data.id}`);
+        entity.onInteract(data.data);
         break;
       }
       

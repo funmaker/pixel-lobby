@@ -1,13 +1,5 @@
 import BSON from "bson";
 
-// Network entities
-import "./entity/entity";
-import "./entity/player";
-import "./entity/staticImage";
-import "./entity/board";
-import "./entity/youtube";
-import "./entity/button";
-
 export const types = {
   JOIN: "JOIN",
   LEAVE: "LEAVE",
@@ -17,7 +9,7 @@ export const types = {
   UPDATE: "UPDATE",
   CHAT: "CHAT",
   MOVE: "MOVE",
-  LINE: "LINE",
+  INTERACT: "INTERACT",
 };
 
 export const join = (name) => BSON.serialize({
@@ -60,7 +52,7 @@ export const move = (key, pressed) => BSON.serialize({
   key, pressed,
 });
 
-export const line = (id, x1, y1, x2, y2, width, clear) => BSON.serialize({
-  type: types.LINE,
-  id, x1, y1, x2, y2, width, clear
+export const interact = (id, data) => BSON.serialize({
+  type: types.INTERACT,
+  id, data
 });

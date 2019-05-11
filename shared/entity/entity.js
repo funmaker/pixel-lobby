@@ -3,25 +3,31 @@ import { SmoothVector, Vector } from "../math";
 import { PHYSICS_TYPE } from "../physics";
 
 export default class Entity {
+  static type = "MissingNo.";
+  static types = {
+    ["MissingNo."]: this,
+  };
+  
+  static registerType = (name, type) => {
+    this.types[name] = type;
+    return name;
+  };
+  
   id = uuid();
   pos = new Vector();
   vel = new Vector();
   size = new Vector();
   physics = PHYSICS_TYPE.NORMAL;
   mass = 1;
-  type = this.constructor.name;
   dirty = false;
   smoothPos = new SmoothVector(0, 0,0, 0.1);
   extraStateUpdate = {};
   room = null;
-  
-  static types = {
-    Entity: this,
-  };
+  type = this.constructor.type;
   
   serialize() {
     return {
-      id: this.id, entityType: this.type,
+      id: this.id, entityType: this.constructor.type,
       pos: this.pos, vel: this.vel,
       extra: this.getExtraState(),
     };
@@ -34,6 +40,7 @@ export default class Entity {
     const entity = TypedEntity.deserialize(entityState);
     entity.id = entityState.id;
     entity.pos = new Vector(entityState.pos);
+    entity.smoothPos.set(entity.pos);
     entity.vel = new Vector(entityState.vel);
     return entity;
   }
@@ -75,6 +82,10 @@ export default class Entity {
   }
   
   onRemove() {
+  
+  }
+  
+  onInteract(data) {
   
   }
   

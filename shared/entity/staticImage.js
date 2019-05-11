@@ -3,6 +3,7 @@ import { Vector } from "../math";
 import { PHYSICS_TYPE } from "../physics";
 
 export default class StaticImage extends Entity {
+  static type = Entity.registerType("StaticImage", this);
   sprite;
   physics = PHYSICS_TYPE.NONE;
   
@@ -27,5 +28,3 @@ export default class StaticImage extends Entity {
     this.sprite.draw(ctx, x, y);
   }
 }
-
-Entity.types.StaticImage = StaticImage;

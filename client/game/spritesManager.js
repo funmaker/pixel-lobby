@@ -19,8 +19,7 @@ export class Sprite extends Drawable {
   };
   
   draw(ctx, x, y, scale = 1) {
-    if(!this.loaded) return console.warn(`${this.name} not loaded!`);
-    ctx.drawImage(this.texture, x - this.width / 2 * scale, y - this.height / 2 * scale, this.width * scale, this.height * scale);
+    ctx.drawImage(this.loaded ? this.texture : this.constructor.fallbackTexture, x - this.width / 2 * scale, y - this.height / 2 * scale, this.width * scale, this.height * scale);
   }
 }
 
@@ -29,6 +28,7 @@ export default class SpritesManager {
   base = [
     "main_bg.png",
     "cinema_bg.png",
+    "cinema_fg.png",
     "beam_fg.png",
     "characters/default.png",
     "particles/heart1.png",

@@ -65,6 +65,9 @@ export default class Room {
   addEntity(entity) {
     entity.room = this;
     this.entities.set(entity.id, entity);
+    if(SERVER) {
+      GAME.sendAll(packets.createEntity(entity), this);
+    }
   }
   
   removeEntity(id) {
@@ -76,9 +79,12 @@ export default class Room {
     entity.room = null;
     
     if(SERVER) {
-      GAME.sendAll(packets.removeEntity(entity));
+      GAME.sendAll(packets.removeEntity(entity), this);
     }
   }
+  
+  findEntity = (type) => [...this.entities.values()].find(entity => entity.type === type);
+  findEntities = (type) => [...this.entities.values()].filter(entity => entity.type === type);
   
   localToCanvas = vec => new Vector(vec.x, 275 - vec.z - vec.y / 2);
   canvasToScreen = vec => new Vector((vec.x - GAME.scroll) * GAME.scale + GAME.render.canvas.width / 2, (vec.y - 275) * GAME.scale + GAME.render.canvas.height, 0);

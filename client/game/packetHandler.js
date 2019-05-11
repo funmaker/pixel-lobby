@@ -52,7 +52,7 @@ function removeEntity(data) {
 }
 
 function chat(data) {
-  const player = [...GAME.room.entities.values()].find(player => player.id === data.id) || GAME.localPlayer;
+  const player = GAME.room.entities.get(data.user) || GAME.localPlayer;
   if(!player) return;
   
   const bubble = new Particle(new ChatBubble(data.text, GAME.render.ctx), player.pos, new Vector(0, 0, 15), 2);

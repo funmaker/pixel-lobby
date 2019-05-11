@@ -10,6 +10,30 @@ export class Vector {
     this.z = z;
   }
   
+  static random(a, b, c, d, e, f, g) {
+    let xmin, xmax, ymin, ymax, zmin, zmax, whole;
+    switch(arguments.length) {
+      case 1: [xmin, xmax, ymin, ymax, zmin, zmax, whole] = [0, a, 0, a, 0, a, true]; break;
+      case 2: [xmin, xmax, ymin, ymax, zmin, zmax, whole] = [a, b, a, b, a, b, false]; break;
+      case 3: [xmin, xmax, ymin, ymax, zmin, zmax, whole] = [a, b, a, b, a, b, c]; break;
+      case 4: [xmin, xmax, ymin, ymax, zmin, zmax, whole] = [0, a, 0, b, 0, c, d]; break;
+      case 6: [xmin, xmax, ymin, ymax, zmin, zmax, whole] = [a, b, c, d, e, f, false]; break;
+      case 7: [xmin, xmax, ymin, ymax, zmin, zmax, whole] = [a, b, c, d, e, f, g]; break;
+      default: throw new TypeError(`Wrong number of arguments: ${arguments.length}`);
+    }
+    
+    if(typeof xmin === "object") xmin = xmin.x;
+    if(typeof xmax === "object") xmax = xmax.x;
+    if(typeof ymin === "object") ymin = ymin.y;
+    if(typeof ymax === "object") ymax = ymax.y;
+    if(typeof zmin === "object") zmin = zmin.z;
+    if(typeof zmax === "object") zmax = zmax.z;
+    
+    const vec = new Vector(Math.random() * (xmax - xmin) + xmin, Math.random() * (ymax - ymin) + ymin, Math.random() * (zmax - zmin) + zmin);
+    if(whole) vec.set(Math.floor(vec.x), Math.floor(vec.y), Math.floor(vec.z));
+    return vec;
+  }
+  
   set(x = 0, y = x, z = x) {
     if(typeof x === "object") return void Object.assign(this, x);
     
@@ -44,6 +68,10 @@ export class Vector {
   div(rhs) {
     if(!(rhs instanceof Vector)) rhs = new Vector(rhs);
     return new Vector(this.x / rhs.x, this.y / rhs.y, this.z / rhs.z);
+  }
+  
+  between(min, max) {
+    return this.x >= min.x && this.x < max.x && this.y >= min.y && this.y < max.y && this.z >= min.z && this.z < max.z;
   }
 }
 

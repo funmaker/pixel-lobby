@@ -1,14 +1,16 @@
-import { createCanvas } from "canvas";
+import _ from "lodash";
+import { createCanvas, loadImage } from "canvas";
 import Entity from "./entity";
 import { Vector } from "../math";
 import { PHYSICS_TYPE } from "../physics";
 import * as packets from "../packets";
 
 export default class Board extends Entity {
+  static type = Entity.registerType("Board", this);
   physics = PHYSICS_TYPE.NONE;
-  canvas; ctx;
+  canvas; ctx; storeKey;
   
-  constructor(pos, size) {
+  constructor(pos, size, storeKey) {
     super();
     this.pos = pos;
     this.size = size;
@@ -16,6 +18,14 @@ export default class Board extends Entity {
     this.ctx = this.canvas.getContext("2d");
     if(CLIENT) {
       window.addEventListener("mousemove", this.onMouseMove);
+    } else {
+      this.storeKey = storeKey;
+      if(this.storeKey) {
+        const data = GAME.store.get(`boards/${this.storeKey}`);
+        if(data) {
+          loadImage("data:image/png;base64," + data.toString("base64")).then(image => this.ctx.drawImage(image, 0, 0));
+        }
+      }
     }
   }
   
@@ -66,10 +76,14 @@ export default class Board extends Entity {
         const lineWidth = GAME.localPlayer.boardTool ? GAME.localPlayer.boardTool.lineWidth : 1.5;
         const clear = GAME.localPlayer.boardTool ? GAME.localPlayer.boardTool.clear : false;
         this.drawLine(ox, oy, cx, cy, lineWidth, clear);
-        GAME.send(packets.line(this.id, ox, oy, cx, cy, lineWidth, clear));
+        GAME.send(packets.interact(this.id, { x1: ox, y1: oy, x2: cx, y2: cy, lineWidth, clear }));
       }
     }
   };
+  
+  onInteract({ x1, y1, x2, y2, lineWidth, clear }) {
+    this.drawLine(x1, y1, x2, y2, lineWidth, clear);
+  }
   
   drawLine(x1, y1, x2, y2, lineWidth = 1.5, clear = false) {
     if(clear) this.ctx.globalCompositeOperation = 'destination-out';
@@ -86,8 +100,13 @@ export default class Board extends Entity {
       if(!this.extraStateUpdate.lines) this.extraStateUpdate.lines = [];
       this.extraStateUpdate.lines.push({ x1, y1, x2, y2, lineWidth, clear });
       this.dirty = true;
+      this.save();
     }
   }
+  
+  save = _.debounce(() => {
+    if(this.storeKey) {
+      GAME.store.set(`boards/${this.storeKey}`, this.canvas.toBuffer());
+    }
+  }, 5000, { maxWait: 30000 });
 }
-
-Entity.types.Board = Board;

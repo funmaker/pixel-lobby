@@ -3,6 +3,7 @@ import { PHYSICS_TYPE } from "../physics";
 import { Vector } from "../math";
 
 export default class Button extends Entity {
+  static type = Entity.registerType("Button", this);
   physics = PHYSICS_TYPE.NONE;
   action = null;
   
@@ -61,5 +62,3 @@ export default class Button extends Entity {
   
   static boardTool = (lineWidth, clear) => ({ type: "boardTool", lineWidth, clear });
 }
-
-Entity.types.Button = Button;

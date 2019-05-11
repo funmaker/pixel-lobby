@@ -1,5 +1,4 @@
 import React from 'react';
-import Game from "../game/game";
 
 const pages = new Set();
 
@@ -11,9 +10,9 @@ export default class IndexPage extends React.Component {
 	canvas = React.createRef();
 	chat = React.createRef();
 	youtube = React.createRef();
-	game = new Game();
 	
 	async componentDidMount() {
+		this.game = new (await import("../game/game")).default();
 		this.game.start(this.canvas.current);
 		document.addEventListener("keypress", this.onKeyPress);
 		pages.add(this);
