@@ -76,12 +76,12 @@ export default class Board extends Entity {
         const lineWidth = GAME.localPlayer.boardTool ? GAME.localPlayer.boardTool.lineWidth : 1.5;
         const clear = GAME.localPlayer.boardTool ? GAME.localPlayer.boardTool.clear : false;
         this.drawLine(ox, oy, cx, cy, lineWidth, clear);
-        GAME.send(packets.interact(this.id, { x1: ox, y1: oy, x2: cx, y2: cy, lineWidth, clear }));
+        this.interact({ x1: ox, y1: oy, x2: cx, y2: cy, lineWidth, clear });
       }
     }
   };
   
-  onInteract({ x1, y1, x2, y2, lineWidth, clear }) {
+  onInteract(player, { x1, y1, x2, y2, lineWidth, clear }) {
     this.drawLine(x1, y1, x2, y2, lineWidth, clear);
   }
   

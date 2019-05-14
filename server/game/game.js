@@ -144,7 +144,7 @@ export default new class Game {
         
         const entity = player.room.entities.get(data.id);
         if(!entity) throw new Error(`Entity not found: ${data.id}`);
-        entity.onInteract(data.data);
+        entity.onInteract(player, data.data);
         break;
       }
       

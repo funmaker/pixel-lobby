@@ -77,6 +77,7 @@ export default class Room {
     entity.onRemove();
     this.entities.delete(id);
     entity.room = null;
+    entity.removed = true;
     
     if(SERVER) {
       GAME.sendAll(packets.removeEntity(entity), this);

@@ -1,6 +1,7 @@
 import uuid from "uuid/v4";
 import { SmoothVector, Vector } from "../math";
 import { PHYSICS_TYPE } from "../physics";
+import * as packets from "../packets";
 
 export default class Entity {
   static type = "MissingNo.";
@@ -23,7 +24,9 @@ export default class Entity {
   smoothPos = new SmoothVector(0, 0,0, 0.1);
   extraStateUpdate = {};
   room = null;
+  removed = false;
   type = this.constructor.type;
+  timers = { interval: [], timeout: [] };
   
   serialize() {
     return {
@@ -68,6 +71,8 @@ export default class Entity {
   }
   
   remove() {
+    this.timers.timeout.forEach(clearTimeout);
+    this.timers.interval.forEach(clearInterval);
     this.room.removeEntity(this.id);
   }
   
@@ -81,11 +86,27 @@ export default class Entity {
     return cx >= 0 && cx < this.size.x && cy >= 0 && cy < this.size.z;
   }
   
+  setTimeout(...args) {
+    const timeout = setTimeout(...args);
+    this.timers.timeout.push(timeout);
+    return timeout;
+  }
+  
+  setInterval(...args) {
+    const interval = setInterval(...args);
+    this.timers.interval.push(interval);
+    return interval;
+  }
+  
   onRemove() {
   
   }
   
-  onInteract(data) {
+  interact(data) {
+    GAME.send(packets.interact(this.id, data));
+  }
+  
+  onInteract(player, data) {
   
   }
   

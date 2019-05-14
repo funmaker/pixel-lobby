@@ -19,7 +19,11 @@ export class Sprite extends Drawable {
   };
   
   draw(ctx, x, y, scale = 1) {
-    ctx.drawImage(this.loaded ? this.texture : this.constructor.fallbackTexture, x - this.width / 2 * scale, y - this.height / 2 * scale, this.width * scale, this.height * scale);
+    if(this.loaded) {
+      ctx.drawImage(this.texture, x - this.width / 2 * scale, y - this.height / 2 * scale, this.width * scale, this.height * scale);
+    } else {
+      ctx.drawImage(this.constructor.fallbackTexture, x - 50 * scale, y - 50 * scale, 100 * scale, 100 * scale);
+    }
   }
 }
 

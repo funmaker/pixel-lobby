@@ -73,6 +73,21 @@ export class Vector {
   between(min, max) {
     return this.x >= min.x && this.x < max.x && this.y >= min.y && this.y < max.y && this.z >= min.z && this.z < max.z;
   }
+  
+  clamp(min, max) {
+    const out = new Vector(this);
+    if(out.x < min.x) out.x = min.x;
+    if(out.x > max.x) out.x = max.x;
+    if(out.y < min.y) out.y = min.y;
+    if(out.y > max.y) out.y = max.y;
+    if(out.z < min.z) out.z = min.z;
+    if(out.z > max.z) out.z = max.z;
+    return out;
+  }
+  
+  normalized() {
+    return this.div(this.magnitude());
+  }
 }
 
 export class Smooth {

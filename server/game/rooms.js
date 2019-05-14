@@ -6,6 +6,7 @@ import Youtube from "../../shared/entity/youtube";
 import Button from "../../shared/entity/button";
 import SpawnZone from "../../shared/entity/zone/spawn";
 import SitZone from "../../shared/entity/zone/sit";
+import Npc from "../../shared/entity/npc";
 
 export function generateRooms() {
   const lobby = new Room("lobby", new Vector(1310, 140, Infinity));
@@ -20,6 +21,8 @@ export function generateRooms() {
   lobby.addEntity(new Button(new Vector(784, 139.9, 58), new Vector(10, 0, 6), Button.boardTool(6, true)));
   lobby.addEntity(new SpawnZone(new Vector(400, 70, 48), new Vector(140, 140, 0)));
   lobby.addEntity(new SitZone(new Vector(1062, 5, 137.5), new Vector(280, 10, 275)));
+  lobby.addEntity(new Npc("Miku", new Vector(400, 70, 0)));
+  lobby.addEntity(new Npc("furret", new Vector(300, 70, 0)));
   
   return [lobby];
 }

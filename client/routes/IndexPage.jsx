@@ -29,7 +29,7 @@ export default class IndexPage extends React.Component {
 			if(this.state.chat === null) {
 				this.setState({ chat: "" }, () => this.chat.current.focus());
 			} else {
-				this.game.onChat(this.state.chat);
+				if(this.state.chat) this.game.onChat(this.state.chat);
 				this.setState({
 					chat: null,
 				})
