@@ -1,13 +1,6 @@
-# Webapp Boilerplate
+# Pixel Lobby
 
-Basic boilerplate for isomorphic React web apps. Including:
-- Node.js
-- React
-- Webpack
-- Sass
-- Babel
-- Handlebars
-- Universal Hot Reload
+Simple Javascript social platform.
 
 ## Usage
 
