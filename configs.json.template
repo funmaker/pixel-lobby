@@ -1,0 +1,7 @@
+{
+	"port": 3939,
+	"discord": {
+		"client": "DISCORD_CLIENT",
+		"secret": "DISCORD_SECRET"
+	}
+}

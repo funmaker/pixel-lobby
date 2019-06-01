@@ -13,8 +13,8 @@ const KEYS = {
 
 export default class Player extends Entity {
   static type = Entity.registerType("Player", this);
+  user;
   name;
-  ws;
   size = new Vector(60, 10, 96);
   sprite = CLIENT ? GAME.sprites.get("characters/default") : "default";
   boardTool = null;
@@ -26,17 +26,12 @@ export default class Player extends Entity {
     jump: false,
   };
   
-  constructor(name, ws) {
+  constructor(name, user) {
     super();
     this.name = name;
+    this.user = user;
     
-    if(SERVER) {
-      this.ws = ws;
-  
-      ws.on("close", () => {
-        this.remove();
-      });
-    } else {
+    if(CLIENT) {
       if(name === "Rivuhh") {
         const interval = setInterval(() => {
           if(!this.room) return clearInterval(interval);

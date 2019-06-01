@@ -1,30 +1,33 @@
 import game from "../game/game";
+import configs from "../helpers/configs";
 import BSON from "bson";
 
 export const router = require('express-promise-router')();
 
-export const users = new Set();
+export const connections = new Set();
 
 router.get('/', (req, res) => {
 	const initialData = {};
+	
+	initialData.discordClientId = configs.discord && configs.discord.client || null;
 	
 	res.react(initialData);
 });
 
 setImmediate(() => {
 	router.ws("/ws", (ws, req) => {
-		users.add(ws);
-		console.log(`User connected: ${req.connection.remoteAddress}`);
+		connections.add(ws);
+		console.log(`Connection open: ${req.connection.remoteAddress}`);
 		
 		ws.on("close", (code, reason) => {
-			console.log(`User disconnected: ${req.connection.remoteAddress}, ${code} - ${reason}`);
-			users.delete(ws);
+			console.log(`Connection closed: ${req.connection.remoteAddress}, ${code} - ${reason}`);
+			connections.delete(ws);
 		});
 		
-		ws.on("message", data => {
+		ws.on("message", async data => {
 			try {
 				data = BSON.deserialize(data);
-				game.handlePacket(ws, data);
+				await game.handlePacket(ws, data);
 			} catch(e) {
 				ws.close(4000, e.message);
 				console.error(e);

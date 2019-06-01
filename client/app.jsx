@@ -1,12 +1,14 @@
 import React from 'react';
-import {Route, Switch, withRouter} from "react-router";
-import {setInitialData} from "./helpers/initialData";
-import isNode from 'detect-node';
-import IndexPage from "client/routes/IndexPage";
+import { Route, Switch, withRouter } from "react-router";
 import { hot } from 'react-hot-loader';
+import isNode from 'detect-node';
+import { setInitialData } from "./helpers/initialData";
+import IndexPage from "client/routes/IndexPage";
+import GamePage from "./routes/GamePage";
+import DiscordAuthPage from "./routes/DiscordAuthPage";
 
 class App extends React.Component {
-	constructor({initialData}) {
+	constructor({ initialData }) {
 		super();
 		
 		if(isNode) {
@@ -29,6 +31,8 @@ class App extends React.Component {
 	render() {
 		return (
 			<Switch>
+				<Route path="/discordAuth" exact component={DiscordAuthPage}/>
+				<Route path="/game" exact component={GamePage}/>
 				<Route path="/" exact component={IndexPage}/>
 			</Switch>
 		)

@@ -28,6 +28,11 @@ export function handlePacket(data) {
     case packets.types.CHAT:
       chat(data);
       break;
+  
+    case packets.types.KICK:
+      alert("You have been kicked: " + data.reason);
+      history.push("/");
+      break;
     
     default:
       console.error(`Unknown packet type: ${data.type}`)
@@ -51,11 +56,13 @@ function removeEntity(data) {
   GAME.room.removeEntity(data.id);
 }
 
-function chat(data) {
-  const player = GAME.room.entities.get(data.user) || GAME.localPlayer;
-  if(!player) return;
+function chat({text, name, playerId}) {
+  const player = GAME.room.entities.get(playerId);
+  if(player) {
+    const bubble = new Particle(new ChatBubble(text, GAME.render.ctx), player.pos, new Vector(0, 0, 15), 2);
+    bubble.pos = bubble.pos.add(new Vector(bubble.drawable.width / 2 + 20, 1, 32));
+    player.room.addEntity(bubble);
+  }
   
-  const bubble = new Particle(new ChatBubble(data.text, GAME.render.ctx), player.pos, new Vector(0, 0, 15), 2);
-  bubble.pos = bubble.pos.add(new Vector(bubble.drawable.width / 2 + 20, 1, 32));
-  player.room.addEntity(bubble);
+  console.log((name ? name + ": " : "") + text);
 }

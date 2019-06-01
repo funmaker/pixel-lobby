@@ -4,11 +4,13 @@ import EventEmitter from "events";
 
 export default class Connection extends EventEmitter {
   socket;
+  auth;
   connected = false;
   closing = false;
   
-  connect() {
+  connect(auth = this.auth) {
     this.closing = false;
+    this.auth = auth;
     this.socket = new WebSocket(`ws://${location.host}/ws`);
     this.socket.binaryType = 'arraybuffer';
   
@@ -22,8 +24,7 @@ export default class Connection extends EventEmitter {
       console.log("Connected");
       this.connected = true;
       
-      if(typeof window.localPlayerName === "undefined") window.localPlayerName = prompt("Enter user name");
-      if(window.localPlayerName) this.send(packets.join(window.localPlayerName));
+      this.send(packets.join(auth));
     });
   
     this.socket.addEventListener("close", event => {

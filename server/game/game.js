@@ -1,28 +1,14 @@
 import isNode from "detect-node";
 import * as packets from "../../shared/packets";
-import { users } from "../routes/index";
-import Player from "../../shared/entity/player";
-import path from "path";
-import fs from "fs-extra";
 import { generateRooms } from "./rooms";
 import Store from "./store";
+import User from "./user";
 
 const YOUTUBE_REGEX = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
 
-const defaultSprites = [
-  "anonymous",
-  "borat",
-  "hitler",
-  "kkk",
-  "bambo",
-  "papaj",
-  "exhibitionist",
-  "orion",
-];
-
 export default new class Game {
   rooms = [];
-  players = new Map();
+  users = new Map();
   lastTick = Date.now();
   store = new Store("store.bson");
   
@@ -51,96 +37,73 @@ export default new class Game {
   };
   
   sendAll(packet, room = null) {
-    for(const user of users) {
-      const player = this.players.get(user);
-      if(player && (room == null || player.room === room)) {
-        try {
-          user.send(packet);
-        } catch(e) {
-          try {
-            user.close();
-          } catch(e) {}
-        }
+    for(const user of this.users.values()) {
+      if(room == null || (user.player && user.player.room === room)) {
+        user.send(packet);
       }
-    }
-  }
-  
-  async determineSprite(name) {
-    const pathname = path.join("./static/images/characters/", path.normalize(`${name}.png`).replace(/^(\.\.(\/|\\|$))+/, ''));
-  
-    if(await fs.pathExists(pathname)) {
-      return name;
-    } else {
-      return defaultSprites[Math.floor(Math.random() * defaultSprites.length)];
     }
   }
   
   async handlePacket(ws, data) {
     if(process.env.NODE_ENV === 'development' && data.type !== packets.types.MOVE && data.type !== packets.types.INTERACT) console.log(data);
-    const player = this.players.get(ws);
+    let user = this.users.get(ws);
+    let player = user && user.player;
     
     switch(data.type) {
       case packets.types.JOIN: {
-        if(player) throw new Error(`User already joined`);
-  
-        const room = this.rooms[0];
-        const spawn = room.findEntity("SpawnZone");
-        const sprite = await this.determineSprite(data.name).catch(console.error);
-        const newPlayer = new Player(data.name, ws);
+        if(user) throw new Error(`User already joined`);
         
-        newPlayer.changeSprite(sprite);
-        if(spawn) newPlayer.pos = spawn.sample();
-        room.addEntity(newPlayer);
-        this.players.set(ws, newPlayer);
-        ws.send(packets.state(room, newPlayer));
-        
-        console.log(newPlayer.name + " joined the game");
+        user = await User.create(ws, data.auth);
+        this.users.set(ws, user);
+        player = user.spawn(this.rooms[0]);
         break;
       }
       
       case packets.types.LEAVE: {
-        if(!player) throw new Error(`User not joined`);
+        if(!user) throw new Error(`User not joined`);
         
-        player.remove();
-  
-        console.log(player.name + " left the game");
+        user.kick("User left the game");
         break;
       }
       
       case packets.types.CHAT: {
-        if(!player) throw new Error(`User not joined`);
+        if(!user) throw new Error(`User not joined`);
         
         const cmd = data.text.split(" ");
         switch(cmd[0]) {
           case "!ytplay": {
+            if(!player) return;
+            
             const match = cmd[1].match(YOUTUBE_REGEX);
             if(!match) return ws.send(packets.chat("Invalid URL"));
             
             const yt = [...player.room.entities.values()].filter(entity => entity.type === "Youtube")
                                                          .sort((a, b) => player.pos.sub(a).magnitude2() - player.pos.sub(b).magnitude2())[0];
             
-            if(!yt) return ws.send(packets.chat("No youtube player found"));
+            if(!yt) return ws.send(packets.chat("No youtube player found."));
             
-            this.sendAll(packets.chat("Changing Video...", player.name));
+            this.sendAll(packets.chat("Changing Video...", user.name, player.id));
             yt.play(match[1], 0);
             break;
           }
 
           default:
-            this.sendAll(packets.chat(data.text, player.id));
+            this.sendAll(packets.chat(data.text, user.name, player ? player.id : null));
         }
         break;
       }
   
       case packets.types.MOVE: {
-        if(!player) throw new Error(`User not joined`);
-    
-        player.move(data.key, data.pressed);
+        if(!user) throw new Error(`User not joined`);
+        if(!player) return;
+  
+        user.player.move(data.key, data.pressed);
         break;
       }
   
       case packets.types.INTERACT: {
-        if(!player) throw new Error(`User not joined`);
+        if(!user) throw new Error(`User not joined`);
+        if(!player) return;
         
         const entity = player.room.entities.get(data.id);
         if(!entity) throw new Error(`Entity not found: ${data.id}`);

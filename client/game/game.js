@@ -13,6 +13,7 @@ context.keys().forEach(filename => context(filename));
 const BUSY_BRAILE = ['⠙', '⠸', '⢰', '⣠', '⣄', '⡆', '⠇', '⠋'];
 
 export default class Game extends EventEmitter {
+  static auth;
   render = new Render();
   connection = new Connection();
   sprites = new SpritesManager();
@@ -37,7 +38,7 @@ export default class Game extends EventEmitter {
   start(canvas) {
     this.render.start(canvas);
     this.render.on("draw", this.onDraw);
-    this.connection.connect();
+    this.connection.connect(this.constructor.auth);
     this.connection.on("packet", handlePacket);
     this.sprites.loadBaseSprites();
     

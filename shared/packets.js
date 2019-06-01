@@ -10,11 +10,12 @@ export const types = {
   CHAT: "CHAT",
   MOVE: "MOVE",
   INTERACT: "INTERACT",
+  KICK: "KICK",
 };
 
-export const join = (name) => BSON.serialize({
+export const join = (auth) => BSON.serialize({
   type: types.JOIN,
-  name,
+  auth,
 });
 
 export const leave = () => BSON.serialize({
@@ -42,9 +43,9 @@ export const update = (room) => BSON.serialize({
   ...room.getUpdate(),
 });
 
-export const chat = (text, user) => BSON.serialize({
+export const chat = (text, name, playerId) => BSON.serialize({
   type: types.CHAT,
-  text, user,
+  text, name, playerId,
 });
 
 export const move = (key, pressed) => BSON.serialize({
@@ -55,4 +56,9 @@ export const move = (key, pressed) => BSON.serialize({
 export const interact = (id, data) => BSON.serialize({
   type: types.INTERACT,
   id, data
+});
+
+export const kick = (reason) => BSON.serialize({
+  type: types.KICK,
+  reason
 });

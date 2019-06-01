@@ -1,0 +1,83 @@
+
+$scale: 4;
+
+@keyframes scrollBg {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 -64px;
+  }
+}
+
+.IndexPage {
+  position: absolute;
+  background: url("/static/images/menu/bg.png") repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: scrollBg 5s infinite linear;
+  image-rendering: crisp-edges;
+  transform: translate(50vw, 50vh) translate(-50%, -50%) scale($scale);
+  width: 100vw / $scale;
+  height: 100vh / $scale;
+
+  .board {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    background: lightgrey;
+    padding: 10px;
+    border-image-slice: 4 25 7 25;
+    border-image-width: 4px 25px 7px 25px;
+    border-image-outset: 4px 4px 4px 6px;
+    border-image-repeat: repeat repeat;
+    border-image-source: url("/static/images/menu/boardborder.png");
+    background: url("/static/images/menu/boardbg.png");
+
+    .logo {
+      margin-bottom: 10px;
+    }
+
+    .button {
+      margin-top: 10px;
+      cursor: pointer;
+      opacity: 0.9;
+      will-change: opacity;
+
+      &:hover:not(.disabled){
+        opacity: 1;
+      }
+
+      &.disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+    }
+
+    .input {
+      flex: 1;
+      min-width: 0;
+      width: 0;
+      height: 15px;
+      background: none;
+      border: none;
+      border-bottom: 1px solid white;
+      color: white;
+      font-family: minecraft;
+      box-sizing: border-box;
+    }
+
+    .nameWrap {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      align-self: stretch;
+
+      .button {
+        margin-top: 0;
+        margin-left: 5px;
+      }
+    }
+  }
+}
