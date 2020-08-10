@@ -1,3 +1,4 @@
+import * as packets from "../../shared/packets";
 import game from "../game/game";
 import configs from "../helpers/configs";
 import BSON from "bson";
@@ -29,7 +30,9 @@ setImmediate(() => {
 				data = BSON.deserialize(data);
 				await game.handlePacket(ws, data);
 			} catch(e) {
-				ws.close(4000, e.message);
+				try { ws.send(packets.kick("Internal Server Error")); } catch(e) {}
+				try { ws.close(4000, "Internal Server Error"); } catch(e) {}
+				console.error(e);
 				console.error(e);
 			}
 		});

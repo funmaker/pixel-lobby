@@ -31,7 +31,7 @@ export function handlePacket(data) {
   
     case packets.types.KICK:
       alert("You have been kicked: " + data.reason);
-      history.push("/");
+      GAME.emit("logout");
       break;
     
     default:
@@ -64,5 +64,5 @@ function chat({text, name, playerId}) {
     player.room.addEntity(bubble);
   }
   
-  console.log((name ? name + ": " : "") + text);
+  GAME.emit("chat", (name ? name + ": " : "") + text);
 }

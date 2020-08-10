@@ -1,4 +1,4 @@
-import uuid from "uuid/v4";
+import { v4 as uuid } from "uuid";
 import { SmoothVector, Vector } from "../math";
 import { PHYSICS_TYPE } from "../physics";
 import * as packets from "../packets";

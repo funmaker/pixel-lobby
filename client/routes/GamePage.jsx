@@ -4,7 +4,8 @@ const pages = new Set();
 
 export default class GamePage extends React.Component {
 	state = {
-		chat: null,
+		chatInput: null,
+		chat: [],
 	};
 	
 	canvas = React.createRef();
@@ -14,11 +15,13 @@ export default class GamePage extends React.Component {
 	async componentDidMount() {
 		const Game = (await import("../game/game")).default;
 		if(!Game.auth) {
-			this.props.history.replace("/");
+			this.onLogout();
 			return;
 		}
 		this.game = new Game();
 		this.game.start(this.canvas.current);
+		this.game.on("logout", this.onLogout);
+		this.game.on("chat", this.onChat);
 		document.addEventListener("keypress", this.onKeyPress);
 		pages.add(this);
 	}
@@ -26,38 +29,56 @@ export default class GamePage extends React.Component {
 	componentWillUnmount() {
 		if(!this.game) return;
 		
+		this.game.off("logout", this.onLogout);
+		this.game.off("chat", this.onChat);
 		this.game.stop();
 		document.removeEventListener("keypress", this.onKeyPress);
-		pages.remove(this);
+		pages.delete(this);
 	}
+	
+	onLogout = () => {
+		this.props.history.replace("/");
+	};
+	
+	onChat = line => {
+		this.setState(state => ({
+			chat: [
+				...state.chat,
+				line
+			]
+		}));
+	};
 	
 	onKeyPress = (ev) => {
 		if(ev.code === "Enter") {
-			if(this.state.chat === null) {
-				this.setState({ chat: "" }, () => this.chat.current.focus());
+			if(this.state.chatInput === null) {
+				this.setState({ chatInput: "" }, () => this.chat.current.focus());
 			} else {
-				if(this.state.chat) this.game.onChat(this.state.chat);
+				if(this.state.chatInput) this.game.onChat(this.state.chatInput);
 				this.setState({
-					chat: null,
+					chatInput: null,
 				})
 			}
 		}
 	};
 	
 	onChatChange = (ev) => {
-		this.setState({ chat: ev.target.value })
+		this.setState({ chatInput: ev.target.value })
 	};
 	
 	onBlur = () => {
-		this.setState({ chat: null });
+		this.setState({ chatInput: null });
 	};
 	
 	render() {
 		return (
 			<div className="GamePage">
 				<canvas className="mainCanvas" ref={this.canvas} />
-				<div className={`chatInput${this.state.chat === null ? " hidden" : ""}`}>
-					<input value={this.state.chat || ""} ref={this.chat}
+				<div className={`chat`}>
+					<div className="log">
+						{this.state.chat.map(line => <div className="line">{line}</div>)}
+					</div>
+					<input value={this.state.chatInput || ""} ref={this.chat}
 								 onChange={this.onChatChange} onBlur={this.onBlur}
 								 onKeyDown={ev => ev.stopPropagation()} onKeyUp={ev => ev.stopPropagation()} />
 				</div>

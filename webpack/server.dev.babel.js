@@ -13,7 +13,7 @@ export default {
 	watch: true,
 	devtool: 'source-map',
 	externals: [nodeExternals({
-		whitelist: ['webpack/hot/signal'],
+		allowlist: ['webpack/hot/signal'],
 	})],
 	entry: [
 		'webpack/hot/signal',

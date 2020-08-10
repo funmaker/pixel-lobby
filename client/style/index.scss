@@ -17,7 +17,14 @@ $scale: 4;
   align-items: center;
   justify-content: center;
   animation: scrollBg 5s infinite linear;
-  image-rendering: crisp-edges;
+  image-rendering:optimizeSpeed;             /* Legal fallback */
+  image-rendering:-moz-crisp-edges;          /* Firefox        */
+  image-rendering:-o-crisp-edges;            /* Opera          */
+  image-rendering:-webkit-optimize-contrast; /* Safari         */
+  image-rendering:optimize-contrast;         /* CSS3 Proposed  */
+  image-rendering:crisp-edges;               /* CSS4 Proposed  */
+  image-rendering:pixelated;                 /* CSS4 Proposed  */
+  -ms-interpolation-mode:nearest-neighbor;   /* IE8+           */
   transform: translate(50vw, 50vh) translate(-50%, -50%) scale($scale);
   width: 100vw / $scale;
   height: 100vh / $scale;
@@ -33,6 +40,7 @@ $scale: 4;
     border-image-outset: 4px 4px 4px 6px;
     border-image-repeat: repeat repeat;
     border-image-source: url("/static/images/menu/boardborder.png");
+    border-style: solid;
     background: url("/static/images/menu/boardbg.png");
 
     .logo {
