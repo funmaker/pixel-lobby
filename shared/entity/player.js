@@ -18,6 +18,7 @@ export default class Player extends Entity {
   size = new Vector(60, 10, 96);
   sprite = CLIENT ? GAME.sprites.get("characters/default") : "default";
   boardTool = null;
+  happy = false;
   keys = {
     up: false,
     down: false,
@@ -35,6 +36,18 @@ export default class Player extends Entity {
       if(name === "Rivuhh") {
         const interval = setInterval(() => {
           if(!this.room) return clearInterval(interval);
+      
+          const ang = Math.random() * Math.PI * 2;
+          const heart = new Particle(GAME.sprites.get(`particles/heart${Math.random() < 0.5 ? 1 : 2}`), this.pos, new Vector(0, 0, 20), 0.75);
+          heart.pos = heart.pos.add(new Vector(Math.sin(ang) * 30, Math.cos(ang) * 15, 28));
+          this.room.addEntity(heart);
+        }, 100)
+      }
+      if(this.name === "Natalie" || this.name === "Natalie2") {
+        const interval = setInterval(() => {
+          console.log(!this.room, this.happy);
+          if(!this.room) return clearInterval(interval);
+          if(!this.happy) return;
           
           const ang = Math.random() * Math.PI * 2;
           const heart = new Particle(GAME.sprites.get(`particles/heart${Math.random() < 0.5 ? 1 : 2}`), this.pos, new Vector(0, 0, 20), 0.75);
@@ -66,6 +79,15 @@ export default class Player extends Entity {
     if(update.extra.name) this.name = update.extra.name;
     if(update.extra.sprite) this.changeSprite(update.extra.sprite);
     if(update.extra.keys) this.keys = update.extra.keys;
+    
+    if(this.name === "Natalie" || this.name === "Natalie2") {
+      this.happy = false;
+      for(const entity of GAME.room.entities.values()) {
+        if(!(entity instanceof Player) || entity.name !== "Fun") continue;
+        if(entity.pos.sub(this.pos).magnitude() < 100) this.happy = true;
+        break;
+      }
+    }
   }
   
   onTick(deltaTime) {
