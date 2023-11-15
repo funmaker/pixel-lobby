@@ -15,7 +15,7 @@
 		"build:prod-package": "babel-node webpack/package.babel.js"
 	},
 	"dependencies": {
-		"axios": "^0.21.2",
+		"axios": "^1.6.0",
 		"body-parser": "^1.20.2",
 		"bson": "^4.0.4",
 		"canvas": "^2.6.1",
