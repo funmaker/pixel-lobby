@@ -11,7 +11,7 @@ export default class Connection extends EventEmitter {
   connect(auth = this.auth) {
     this.closing = false;
     this.auth = auth;
-    this.socket = new WebSocket(`ws://${location.host}/ws`);
+    this.socket = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/ws`);
     this.socket.binaryType = 'arraybuffer';
   
     this.socket.addEventListener("message", event => {

@@ -19,7 +19,7 @@ export default class Youtube extends Entity {
     if(CLIENT) {
       this.playerWrapper = document.createElement('div');
       document.body.prepend(this.playerWrapper);
-      this.player = new YouTubePlayer(this.playerWrapper);
+      this.player = YouTubePlayer(this.playerWrapper);
       this.player.on('ready', ev => this.playerRaw = ev.target);
       this.player.on('stateChange', this.onStateChange);
       this.player.getIframe().then(iframe => this.playerDOM = iframe);
