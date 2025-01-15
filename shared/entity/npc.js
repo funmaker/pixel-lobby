@@ -4,7 +4,7 @@ import Particle from "./particle";
 
 const MASTERS = {
   furret: "Luksor",
-  Miku: "Fun",
+  Miku: "funmaker",
 };
 
 export default class Npc extends Entity {
