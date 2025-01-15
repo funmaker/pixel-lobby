@@ -18,7 +18,7 @@
 		"axios": "^0.21.2",
 		"body-parser": "^1.19.0",
 		"bson": "^4.0.4",
-		"canvas": "^2.6.1",
+		"canvas": "^3.0.1",
 		"chalk": "latest",
 		"compression": "^1.7.4",
 		"cookie-parser": "^1.4.5",
@@ -37,9 +37,9 @@
 		"react-router": "^5.2.0",
 		"react-router-dom": "^5.2.0",
 		"source-map-support": "^0.5.19",
-		"uuid": "latest",
+		"uuid": "^8.3.0",
 		"youtube-player": "^5.5.2",
-		"lodash": "latest"
+		"lodash": "^4.17.21"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.11.1",
@@ -58,9 +58,9 @@
 		"handlebars": "^4.7.7",
 		"handlebars-loader": "^1.7.1",
 		"mini-css-extract-plugin": "^0.9.0",
-		"node-sass": "^7.0.0",
 		"npm-run-all": "^4.1.5",
 		"sass-loader": "^9.0.3",
+		"sass": "^1.83.4",
 		"start-server-webpack-plugin": "^2.2.5",
 		"style-loader": "^1.2.1",
 		"webpack": "^4.44.1",
