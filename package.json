@@ -65,7 +65,7 @@
 		"style-loader": "^1.2.1",
 		"webpack": "^4.44.1",
 		"webpack-cli": "^3.3.12",
-		"webpack-dev-middleware": "^8.0.3",
+		"webpack-dev-middleware": "^8.3.0",
 		"webpack-hot-middleware": "^2.25.0",
 		"webpack-node-externals": "^2.5.1"
 	},
